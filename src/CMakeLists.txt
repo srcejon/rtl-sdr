@@ -18,27 +18,29 @@
 ########################################################################
 # Setup shared library variant
 ########################################################################
-add_library(rtlsdr SHARED librtlsdr.c
-  tuner_e4k.c tuner_fc0012.c tuner_fc0013.c tuner_fc2580.c tuner_r82xx.c)
-target_link_libraries(rtlsdr ${LIBUSB_LIBRARIES} ${THREADS_PTHREADS_LIBRARY})
-target_include_directories(rtlsdr PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>  # <prefix>/include
-  ${LIBUSB_INCLUDE_DIRS}
-  ${THREADS_PTHREADS_INCLUDE_DIR}
-  )
-set_target_properties(rtlsdr PROPERTIES DEFINE_SYMBOL "rtlsdr_EXPORTS")
-set_target_properties(rtlsdr PROPERTIES OUTPUT_NAME rtlsdr)
-set_target_properties(rtlsdr PROPERTIES SOVERSION ${MAJOR_VERSION})
-set_target_properties(rtlsdr PROPERTIES VERSION ${LIBVER})
-generate_export_header(rtlsdr)
+if(BUILD_SHARED_LIBS)
+  add_library(rtlsdr SHARED librtlsdr.c
+    tuner_e4k.c tuner_fc0012.c tuner_fc0013.c tuner_fc2580.c tuner_r82xx.c)
+  target_link_libraries(rtlsdr ${LIBUSB_LIBRARIES} ${THREADS_PTHREADS_LIBRARY})
+  target_include_directories(rtlsdr PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>  # <prefix>/include
+    ${LIBUSB_INCLUDE_DIRS}
+    ${THREADS_PTHREADS_INCLUDE_DIR}
+    )
+  set_target_properties(rtlsdr PROPERTIES DEFINE_SYMBOL "rtlsdr_EXPORTS")
+  set_target_properties(rtlsdr PROPERTIES OUTPUT_NAME rtlsdr)
+  set_target_properties(rtlsdr PROPERTIES SOVERSION ${MAJOR_VERSION})
+  set_target_properties(rtlsdr PROPERTIES VERSION ${LIBVER})
+  generate_export_header(rtlsdr)
+endif()
 
 ########################################################################
 # Setup static library variant
 ########################################################################
 add_library(rtlsdr_static STATIC librtlsdr.c
   tuner_e4k.c tuner_fc0012.c tuner_fc0013.c tuner_fc2580.c tuner_r82xx.c)
-target_link_libraries(rtlsdr ${LIBUSB_LIBRARIES} ${THREADS_PTHREADS_LIBRARY})
+target_link_libraries(rtlsdr_static ${LIBUSB_LIBRARIES} ${THREADS_PTHREADS_LIBRARY})
 target_include_directories(rtlsdr_static PUBLIC
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>  # <prefix>/include
@@ -160,9 +162,11 @@ endif()
 ########################################################################
 # Install built library files & utilities
 ########################################################################
-install(TARGETS rtlsdr EXPORT RTLSDR-export
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} # .so/.dylib file
-  )
+if(BUILD_SHARED_LIBS)
+  install(TARGETS rtlsdr EXPORT RTLSDR-export
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} # .so/.dylib file
+    )
+endif()
 install(TARGETS rtlsdr_static EXPORT RTLSDR-export
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} # .so/.dylib file
   )

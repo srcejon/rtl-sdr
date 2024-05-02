@@ -46,6 +46,8 @@ set(VERSION_INFO_MINOR_VERSION 0) # increment minor on feature-level changes
 set(VERSION_INFO_PATCH_VERSION 1) # increment patch for bug fixes and docs
 include(Version) # setup version info
 
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+
 ########################################################################
 # Compiler specific setup
 ########################################################################
